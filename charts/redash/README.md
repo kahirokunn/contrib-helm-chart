@@ -15,7 +15,7 @@ Current chart version is `3.2.0`
 ## Prerequisites
 
 - At least 3 GB of RAM available on your cluster
-- Kubernetes 1.31+ - chart is tested with latest 4 stable versions (1.31-1.34)
+- Kubernetes 1.33+ - chart is tested with latest 4 stable versions (1.33-1.36)
 - Helm 3 (Helm 2 depreciated)
 - PV provisioner support in the underlying infrastructure
 
