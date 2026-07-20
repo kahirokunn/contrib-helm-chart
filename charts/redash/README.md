@@ -8,7 +8,7 @@ This chart bootstraps a [Redash](https://github.com/getredash/redash) deployment
 
 This is a contributed project developed by volunteers and not officially supported by Redash.
 
-Current chart version is `3.2.0`
+Current chart version is `4.1.0`
 
 * <https://github.com/getredash/redash>
 
@@ -52,6 +52,14 @@ $ helm upgrade --install -f my-values.yaml my-release redash/redash
 The command deploys Redash on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section and and default [values.yaml](values.yaml) lists the parameters that can be configured during installation.
 
 > **Tip**: List all releases using `helm list`
+
+## Knative Serving
+
+Set `server.knative.enabled=true` to render the Redash web server as a Knative Service instead of a Kubernetes Deployment. Workers, scheduler, migrations, PostgreSQL, and Redis still render as standard Kubernetes resources.
+
+When Knative mode is enabled, the chart-managed `ingress` and `service` resources are skipped and Knative handles routing instead. Configure autoscaling through `server.knative.annotations`, including `autoscaling.knative.dev/*` keys such as `min-scale` and `max-scale`, and set revision fields such as `containerConcurrency` or `timeoutSeconds` through `server.knative.spec`.
+
+Knative mode requires Knative Serving to be available on the target cluster. Some server pod settings use Knative feature-gated PodSpec fields, such as `server.initContainers`, `server.nodeSelector`, `server.affinity`, `server.tolerations`, `server.priorityClassName`, `server.podSecurityContext`, and some `server.volumes` values. Enable the corresponding Knative `config-features` flags before setting those values; otherwise Knative admission rejects the Service and `helm install/upgrade` fails.
 
 ## Uninstalling the Chart
 
@@ -229,6 +237,9 @@ The following table lists the configurable parameters of the Redash chart and th
 | server.env | object | `{}` | Redash server specific environment variables Don't use this for variables that are in the configuration above, however. |
 | server.httpPort | int | `5000` | Server container port (only useful if you are using a customized image) |
 | server.initContainers | list | `[]` | Server init containers configuration |
+| server.knative.annotations | object | `{}` | Annotations for the Knative revision template, including `autoscaling.knative.dev/*` settings |
+| server.knative.enabled | bool | `false` | Render the server as a Knative Service instead of a Deployment |
+| server.knative.spec | object | `{}` | Additional fields for the Knative revision spec (e.g. `containerConcurrency`, `timeoutSeconds`) |
 | server.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":90,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":1}` | Server liveness probe configuration |
 | server.nodeSelector | object | `{}` | Node labels for server pod assignment [ref](https://kubernetes.io/docs/user-guide/node-selection/) |
 | server.podAnnotations | object | `{}` | Annotations for server pod assignment [ref](https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/) |
