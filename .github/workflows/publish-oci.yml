@@ -30,6 +30,12 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
+      - name: Add Helm repositories
+        shell: bash
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+
       - name: Read and validate chart version
         id: chart
         shell: bash
@@ -53,9 +59,10 @@ jobs:
           echo "name=$chart_name" >> "$GITHUB_OUTPUT"
           echo "version=$chart_version" >> "$GITHUB_OUTPUT"
 
-      - name: Lint chart
+      - name: Build dependencies and lint chart
         shell: bash
         run: |
+          helm dependency build "$CHART_PATH"
           helm lint "$CHART_PATH"
 
       - name: Log in to GHCR
